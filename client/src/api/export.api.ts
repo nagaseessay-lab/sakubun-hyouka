@@ -16,7 +16,7 @@ export async function generateExport(roundId: number) {
   return result;
 }
 
-export async function downloadExport(filename: string) {
+export async function downloadExport(_filename: string) {
   // GAS版ではgenerateExportが直接ダウンロードするため、この関数は互換用
   console.warn('downloadExport is deprecated in GAS version. Use generateExport instead.');
 }
@@ -57,7 +57,7 @@ export async function updateUser(id: number, body: any) {
   return gasPost('users.update', { userId: id, ...body });
 }
 
-export async function resetUserPassword(id: number) {
+export async function resetUserPassword(_id: number) {
   // GAS版ではGoogle Sign-Inのためパスワードリセットは不要
   console.warn('resetUserPassword is not applicable in Google Sign-In version');
   return { message: 'Google Sign-In版ではパスワードリセットは不要です' };

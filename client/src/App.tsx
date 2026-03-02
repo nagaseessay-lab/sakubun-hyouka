@@ -1,4 +1,4 @@
-import { Component, ReactNode } from 'react';
+import { Component, type ReactNode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';

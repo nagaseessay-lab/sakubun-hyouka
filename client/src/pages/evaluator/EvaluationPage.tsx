@@ -12,7 +12,7 @@ export default function EvaluationPage() {
   const location = useLocation();
   const basePath = location.pathname.startsWith('/leader') ? '/leader' : '/evaluator';
   const [assignment, setAssignment] = useState<Assignment | null>(null);
-  const [score, setScore] = useState<Score | null>(null);
+  const [_score, setScore] = useState<Score | null>(null);
   const [criteria, setCriteria] = useState<SecondPhaseCriterion[]>([]);
   const [formData, setFormData] = useState({
     score: null as number | null,

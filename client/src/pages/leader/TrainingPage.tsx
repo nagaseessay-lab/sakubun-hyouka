@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { listRounds } from '../../api/rounds.api';
 import { listEssays } from '../../api/essays.api';
 import { listRubrics } from '../../api/rubrics.api';
-import { listUsers, downloadExport } from '../../api/export.api';
+import { listUsers } from '../../api/export.api';
 import {
   listTrainings, createTraining, deleteTraining,
   getTraining, addTrainingItem, addTrainingItemWithPdf, updateTrainingItem, deleteTrainingItem,
@@ -249,9 +249,8 @@ export default function TrainingPage() {
   async function handleExportCompletions() {
     setExporting(true);
     try {
-      const result = await exportTrainingCompletions();
-      await downloadExport(result.filename);
-      showMsg('Excelファイルをダウンロードしました');
+      await exportTrainingCompletions();
+      showMsg('CSVファイルをダウンロードしました');
     } catch (err: any) {
       setError(err?.message || err || 'Excel出力に失敗しました');
     } finally {

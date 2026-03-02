@@ -18,7 +18,7 @@ export async function getEssay(id: number) {
   return gasPost('essays.get', { essayId: id });
 }
 
-export function getEssayPdfUrl(id: number) {
+export function getEssayPdfUrl(_id: number) {
   // GAS版ではGoogle Drive URLを返す（essays.getPdfUrlで取得）
   // この関数は同期的にURLを返す旧互換用。実際にはgetEssayPdfBlobを使う
   return '';

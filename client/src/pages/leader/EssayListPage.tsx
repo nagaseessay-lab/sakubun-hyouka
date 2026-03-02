@@ -251,12 +251,6 @@ export default function EssayListPage() {
     }
   }
 
-  // Format evaluator display with login_id
-  function evalDisplay(name: string | null, loginId: string | null) {
-    if (!name) return '-';
-    return loginId ? `${name} (${loginId})` : name;
-  }
-
   const totalPages = Math.ceil(total / limit);
 
   const selectedRoundData = rounds.find(r => r.id === selectedRound);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { listRounds } from '../../api/rounds.api';
-import { getRoundAssignments, autoAssign, previewAutoAssign, confirmAutoAssign, manualAssign, reassign, removeAssignment, reopenAssignment, generateMapping, confirmAutoAssignWithMapping } from '../../api/assignments.api';
+import { getRoundAssignments, previewAutoAssign, confirmAutoAssign, manualAssign, reassign, removeAssignment, reopenAssignment, generateMapping, confirmAutoAssignWithMapping } from '../../api/assignments.api';
 import { getAvailabilitySummary } from '../../api/availability.api';
 import { listUsers } from '../../api/export.api';
 import type { EvaluationRound } from '../../types';

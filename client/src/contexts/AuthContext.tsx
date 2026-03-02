@@ -1,7 +1,7 @@
 /**
  * AuthContext - Google Sign-In + GAS Web App 認証
  */
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { User } from '../types';
 import { gasPost, setAccessToken, getAccessToken } from '../api/client';
 import { GAS_CONFIG } from '../config/gas';

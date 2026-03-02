@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { listRounds } from '../../api/rounds.api';
-import { generateExport, downloadExport, getEvaluatorStats, exportEvaluatorStats } from '../../api/export.api';
+import { generateExport, getEvaluatorStats, exportEvaluatorStats } from '../../api/export.api';
 import type { EvaluationRound } from '../../types';
 
 export default function ExportPage() {
   const [rounds, setRounds] = useState<EvaluationRound[]>([]);
   const [selectedRound, setSelectedRound] = useState<number>(0);
   const [generating, setGenerating] = useState(false);
-  const [downloadUrl, setDownloadUrl] = useState('');
-  const [filename, setFilename] = useState('');
+  const [exportDone, setExportDone] = useState(false);
   const [error, setError] = useState('');
 
   // Salary calculation export state
@@ -19,8 +18,7 @@ export default function ExportPage() {
   const [salaryStats, setSalaryStats] = useState<any[]>([]);
   const [salaryLoading, setSalaryLoading] = useState(false);
   const [salaryGenerating, setSalaryGenerating] = useState(false);
-  const [salaryFilename, setSalaryFilename] = useState('');
-  const [salaryDownloadReady, setSalaryDownloadReady] = useState(false);
+  const [salaryExportDone, setSalaryExportDone] = useState(false);
   const [salaryError, setSalaryError] = useState('');
 
   useEffect(() => {
@@ -33,23 +31,14 @@ export default function ExportPage() {
   async function handleExport() {
     setGenerating(true);
     setError('');
-    setDownloadUrl('');
+    setExportDone(false);
     try {
-      const result = await generateExport(selectedRound);
-      setFilename(result.filename);
-      setDownloadUrl(result.downloadUrl);
+      await generateExport(selectedRound);
+      setExportDone(true);
     } catch (err: any) {
       setError(err?.message || err || 'Excel出力に失敗しました');
     } finally {
       setGenerating(false);
-    }
-  }
-
-  async function handleDownload() {
-    try {
-      await downloadExport(filename);
-    } catch {
-      alert('ダウンロードに失敗しました');
     }
   }
 
@@ -58,8 +47,7 @@ export default function ExportPage() {
     setSalaryLoading(true);
     setSalaryError('');
     setSalaryStats([]);
-    setSalaryDownloadReady(false);
-    setSalaryFilename('');
+    setSalaryExportDone(false);
     try {
       const params: any = {};
       if (salaryDateFrom) params.dateFrom = salaryDateFrom;
@@ -77,27 +65,18 @@ export default function ExportPage() {
   async function handleSalaryExport() {
     setSalaryGenerating(true);
     setSalaryError('');
-    setSalaryDownloadReady(false);
+    setSalaryExportDone(false);
     try {
       const body: any = {};
       if (salaryDateFrom) body.dateFrom = salaryDateFrom;
       if (salaryDateTo) body.dateTo = salaryDateTo;
       if (salaryRoundId) body.roundId = salaryRoundId;
-      const result = await exportEvaluatorStats(body);
-      setSalaryFilename(result.filename);
-      setSalaryDownloadReady(true);
+      await exportEvaluatorStats(body);
+      setSalaryExportDone(true);
     } catch (err: any) {
       setSalaryError(err?.message || err || 'Excel出力に失敗しました');
     } finally {
       setSalaryGenerating(false);
-    }
-  }
-
-  async function handleSalaryDownload() {
-    try {
-      await downloadExport(salaryFilename);
-    } catch {
-      alert('ダウンロードに失敗しました');
     }
   }
 
@@ -149,8 +128,7 @@ export default function ExportPage() {
       {tab === 'round' && (
         <div className="card" style={{ maxWidth: 500 }}>
           <p style={{ color: '#64748b', marginBottom: 16 }}>
-            評価回の結果をExcelファイルとして出力します。<br />
-            1次採点結果、2次採点結果、ランキング、採点者集計の4シート構成です。
+            評価回の結果をCSVファイルとして出力します。
           </p>
 
           <div className="form-group">
@@ -163,15 +141,12 @@ export default function ExportPage() {
           {error && <div className="error-message">{error}</div>}
 
           <button className="btn-primary" onClick={handleExport} disabled={generating || !selectedRound}>
-            {generating ? '生成中...' : 'Excel生成'}
+            {generating ? '生成中...' : 'CSV出力'}
           </button>
 
-          {downloadUrl && (
+          {exportDone && (
             <div style={{ marginTop: 16, background: '#dcfce7', padding: 16, borderRadius: 8 }}>
-              <p style={{ fontWeight: 600, color: '#16a34a', marginBottom: 8 }}>生成完了</p>
-              <button className="btn-success" onClick={handleDownload}>
-                ダウンロード ({filename})
-              </button>
+              <p style={{ fontWeight: 600, color: '#16a34a' }}>ダウンロードが開始されました</p>
             </div>
           )}
         </div>
@@ -183,7 +158,7 @@ export default function ExportPage() {
           <div className="card" style={{ maxWidth: 700, marginBottom: 20 }}>
             <p style={{ color: '#64748b', marginBottom: 16 }}>
               給与計算用に、全評価者のフェーズ別評価完了件数を出力します。<br />
-              期間・評価回で絞り込み、プレビュー後にExcelとしてダウンロードできます。
+              期間・評価回で絞り込み、プレビュー後にCSVとしてダウンロードできます。
             </p>
 
             <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'flex-end' }}>
@@ -223,16 +198,13 @@ export default function ExportPage() {
                 <h2 style={{ fontSize: 16, margin: 0 }}>評価者別集計 ({Object.keys(userSummary).length}名)</h2>
                 <button className="btn-primary" onClick={handleSalaryExport}
                   disabled={salaryGenerating} style={{ padding: '6px 16px' }}>
-                  {salaryGenerating ? '生成中...' : 'Excel出力'}
+                  {salaryGenerating ? '生成中...' : 'CSV出力'}
                 </button>
               </div>
 
-              {salaryDownloadReady && (
-                <div style={{ marginBottom: 16, background: '#dcfce7', padding: 12, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontWeight: 600, color: '#16a34a' }}>生成完了</span>
-                  <button className="btn-success" onClick={handleSalaryDownload} style={{ padding: '4px 12px' }}>
-                    ダウンロード
-                  </button>
+              {salaryExportDone && (
+                <div style={{ marginBottom: 16, background: '#dcfce7', padding: 12, borderRadius: 8 }}>
+                  <span style={{ fontWeight: 600, color: '#16a34a' }}>ダウンロードが開始されました</span>
                 </div>
               )}
 
